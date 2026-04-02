@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reclamos CEDIS</title>
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjogIlJlY2xhbW9zIENFRElTIiwgInNob3J0X25hbWUiOiAiQ0VESVMiLCAic3RhcnRfdXJsIjogIi4iLCAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwgImJhY2tncm91bmRfY29sb3IiOiAiIzFhNTZiNyIsICJ0aGVtZV9jb2xvciI6ICIjMWE1NmI3In0=">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #1a56db;
+            --primary-dark: #1e429f;
+            --secondary: #f59e0b;
+            --danger: #e02424;
+            --success: #0e9f6e;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        @keyframes growBar {
+            from { width: 0; }
+            to { width: var(--target-width); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .hidden { display: none !important; }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--gray-800);
+            border: 2px solid var(--gray-200);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        /* Login Screen */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 20px;
+        }
+        
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 400px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 36px;
+            color: white;
+            box-shadow: 0 8px 16px rgba(26, 86, 219, 0.3);
+        }
+        
+        .login-box h1 {
+            text-align: center;
+            color: var(--gray-800);
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+        
+        .login-box .subtitle {
+            text-align: center;
+            color: var(--gray-600);
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray-800);
+            font-size: 14px;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        /* App Layout */
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .app-header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+        
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .app-content {
+            flex: 1;
+            padding: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* Stats Bars - Nuevo diseño lineal compacto */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-bar-card {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .stat-bar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stat-bar-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-600);
+        }
+        
+        .stat-bar-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .stat-bar-icon.pendiente { background: #fef3c7; color: #92400e; }
+        .stat-bar-icon.proceso { background: #dbeafe; color: #1e40af; }
+        .stat-bar-icon.resuelto { background: #d1fae5; color: #065f46; }
+        .stat-bar-icon.total { background: #f3f4f6; color: var(--gray-600); }
+        
+        .stat-bar-numbers {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        
+        .stat-bar-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gray-800);
+            line-height: 1;
+        }
+        
+        .stat-bar-percent {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+        
+        .stat-bar-visual {
+            width: 100%;
+            height: 6px;
+            background: var(--gray-100);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .stat-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.6s ease-out;
+            animation: growBar 0.8s ease-out;
+        }
+        
+        .stat-bar-fill.pendiente { background: var(--secondary); }
+        .stat-bar-fill.proceso { background: var(--primary); }
+        .stat-bar-fill.resuelto { background: var(--success); }
+        .stat-bar-fill.total { background: var(--gray-600); }
+        
+        /* Actions Bar */
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 48px;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: white;
+            border: 2px solid var(--gray-200);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .filter-chip:hover, .filter-chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        /* Claims List */
+        .claims-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .claim-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .claim-card:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .claim-card.pendiente { border-left-color: var(--secondary); }
+        .claim-card.proceso { border-left-color: var(--primary); }
+        .claim-card.resuelto { border-left-color: var(--success); }
+        
+        .claim-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+        
+        .claim-id {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 14px;
+        }
+        
+        .claim-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .claim-status.pendiente { background: #fef3c7; color: #92400e; }
+        .claim-status.proceso { background: #dbeafe; color: #1e40af; }
+        .claim-status.resuelto { background: #d1fae5; color: #065f46; }
+        
+        .claim-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 8px;
+        }
+        
+        .claim-meta {
+            display: flex;
+            gap: 16px;
+            color: var(--gray-600);
+            font-size: 14px;
+            flex-wrap: wrap;
+        }
+        
+        .claim-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        /* Detail View */
+        .detail-view {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 2px solid var(--gray-100);
+        }
+        
+        .detail-title-section h2 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .detail-meta {
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+        
+        .detail-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .detail-section {
+            margin-bottom: 32px;
+        }
+        
+        .detail-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--gray-800);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        .info-item {
+            background: var(--gray-50);
+            padding: 16px;
+            border-radius: 8px;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        .products-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .product-item {
+            background: var(--gray-50);
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            gap: 16px;
+            align-items: start;
+        }
+        
+        .product-image {
+            width: 80px;
+            height: 80px;
+            background: var(--gray-200);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+        
+        .product-details {
+            flex: 1;
+        }
+        
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .product-sku {
+            color: var(--gray-600);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .product-reason {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--gray-200);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -28px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        
+        .timeline-time {
+            font-size: 12px;
+            color: var(--gray-600);
+            margin-bottom: 4px;
+        }
+        
+        .timeline-content {
+            background: var(--gray-50);
+            padding: 12px;
+            border-radius: 8px;
+        }
+        
+        /* Form Styles */
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+        
+        .form-section h3 {
+            margin-bottom: 20px;
+            color: var(--gray-800);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .quantity-group {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+        
+        .quantity-group input[type="number"] {
+            flex: 1;
+        }
+        
+        .quantity-group select {
+            width: 80px;
+            padding: 12px 8px;
+        }
+        
+        .file-upload {
+            border: 2px dashed var(--gray-300);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--primary);
+            background: var(--gray-50);
+        }
+        
+        .file-upload-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+        
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        .modal-text {
+            color: var(--gray-600);
+            margin-bottom: 24px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--gray-800);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1001;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .empty-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .empty-text {
+            color: var(--gray-600);
+            margin-bottom: 24px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-box {
+                padding: 24px;
+            }
+            
+            .app-content {
+                padding: 16px;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .detail-header {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .detail-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+            
+            .detail-actions .btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <div class="app-icon">📦</div>
+            <h1>Reclamos CEDIS</h1>
+            <p class="subtitle">Sistema de gestión de reclamos</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Correo electrónico</label>
+                    <input type="email" id="email" placeholder="tu@empresa.com" value="tienda@ejemplo.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="password" placeholder="••••••••" value="123456" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                    Iniciar Sesión
+                </button>
+            </form>
+            
+            <div style="margin-top: 24px; text-align: center; font-size: 14px; color: var(--gray-600);">
+                <p>Demo: tienda@ejemplo.com / 123456</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP CONTAINER -->
+    <div id="appContainer" class="app-container hidden">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="header-icon">📦</div>
+                <span class="header-title">Reclamos CEDIS</span>
+            </div>
+            <div class="header-user">
+                <span id="userName" style="font-weight: 500;">Tienda Principal</span>
+                <div class="user-avatar">TP</div>
+                <button class="btn btn-secondary" onclick="logout()" style="padding: 8px 16px;">
+                    Salir
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-content">
+            
+            <!-- DASHBOARD VIEW -->
+            <div id="dashboardView">
+                <!-- Stats Bars Compactos -->
+                <div class="stats-container" id="statsContainer">
+                    <!-- Se genera dinámicamente -->
+                </div>
+
+                <!-- Actions -->
+                <div class="actions-bar">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Buscar por ID, producto o descripción..." onkeyup="filterClaims()">
+                    </div>
+                    <button class="btn btn-primary" onclick="showNewClaim()">
+                        <span>+</span> Nuevo Reclamo
+                    </button>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters">
+                    <div class="filter-chip active" onclick="filterByStatus('todos', this)">Todos</div>
+                    <div class="filter-chip" onclick="filterByStatus('pendiente', this)">Pendientes</div>
+                    <div class="filter-chip" onclick="filterByStatus('proceso', this)">En Proceso</div>
+                    <div class="filter-chip" onclick="filterByStatus('resuelto', this)">Resueltos</div>
+                </div>
+
+                <!-- Claims List -->
+                <div class="claims-list" id="claimsList">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+
+            <!-- NEW CLAIM VIEW -->
+            <div id="newClaimView" class="hidden">
+                <div style="margin-bottom: 24px;">
+                    <button class="btn btn-secondary" onclick="showDashboard()">← Volver al listado</button>
+                </div>
+
+                <h2 style="margin-bottom: 24px;">Nuevo Reclamo</h2>
+
+                <form id="newClaimForm" onsubmit="submitClaim(event)">
+                    <div class="form-section">
+                        <h3>📍 Información General</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tienda *</label>
+                                <select required>
+                                    <option value="">Seleccionar tienda</option>
+                                    <option value="T001" selected>Tienda Principal - T001</option>
+                                    <option value="T002">Tienda Norte - T002</option>
+                                    <option value="T003">Tienda Sur - T003</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>CEDIS Destino *</label>
+                                <select required>
+                                    <option value="">Seleccionar CEDIS</option>
+                                    <option value="CD001" selected>CEDIS Central - CD001</option>
+                                    <option value="CD002">CEDIS Norte - CD002</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Prioridad</label>
+                                <select>
+                                    <option value="baja">Baja</option>
+                                    <option value="media" selected>Media</option>
+                                    <option value="alta">Alta</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo de Reclamo</label>
+                                <select>
+                                    <option value="producto_danado">Producto Dañado</option>
+                                    <option value="faltante">Faltante de Mercancía</option>
+                                    <option value="sobrante">Sobrante de Mercancía</option>
+                                    <option value="calidad">Problema de Calidad</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📦 Productos</h3>
+                        <div id="productsContainer">
+                            <div class="product-item" style="background: white; border: 2px solid var(--gray-200);">
+                                <div class="form-group" style="flex: 1;">
+                                    <label>SKU / Código de Producto *</label>
+                                    <input type="text" placeholder="Ej: PROD-001" required>
+                                </div>
+                                <div class="form-group" style="flex: 2;">
+                                    <label>Descripción del Producto *</label>
+                                    <input type="text" placeholder="Nombre del producto" required>
+                                </div>
+                                <div class="form-group" style="width: 150px;">
+                                    <label>Cantidad *</label>
+                                    <div class="quantity-group">
+                                        <input type="number" step="0.01" min="0.01" value="1" required>
+                                        <select>
+                                            <option value="u">u</option>
+                                            <option value="kg">kg</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="margin-top: 16px;" onclick="addProductField()">
+                            + Agregar otro producto
+                        </button>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📝 Detalles del Problema</h3>
+                        <div class="form-group">
+                            <label>Descripción del reclamo *</label>
+                            <textarea placeholder="Describe detalladamente el problema encontrado..." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Acción esperada *</label>
+                            <select required>
+                                <option value="">Seleccionar acción...</option>
+                                <option value="reposicion">Reposición del material</option>
+                                <option value="traslado">Traslado</option>
+                                <option value="301">301</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📸 Evidencia Fotográfica</h3>
+                        <div class="file-upload" onclick="simulateUpload()">
+                            <div class="file-upload-icon">📷</div>
+                            <p style="font-weight: 600; margin-bottom: 8px;">Arrastra fotos aquí o haz clic para subir</p>
+                            <p style="font-size: 14px; color: var(--gray-600);">Máximo 5 fotos (JPG, PNG)</p>
+                        </div>
+                        <div id="uploadedFiles" style="margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap;"></div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>👥 Destinatarios</h3>
+                        <div class="form-group">
+                            <label>Notificar a (correos separados por coma)</label>
+                            <input type="text" placeholder="ejemplo@empresa.com, otro@empresa.com" value="cedis@empresa.com, calidad@empresa.com">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 16px; justify-content: flex-end; margin-top: 32px;">
+                        <button type="button" class="btn btn-secondary" onclick="showDashboard()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            Enviar Reclamo
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- CLAIM DETAIL VIEW -->
+            <div id="claimDetailView" class="hidden">
+                <div style="margin-bottom: 24px;">
+                    <button class="btn btn-secondary" onclick="showDashboard()">← Volver al listado</button>
+                </div>
+
+                <div class="detail-view" id="detailContent">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL -->
+    <div id="modal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h3 class="modal-title" id="modalTitle">Título</h3>
+            <p class="modal-text" id="modalText">Mensaje</p>
+            <div class="modal-actions" id="modalActions">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="confirmModal()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast">
+        <span id="toastIcon">✓</span>
+        <span id="toastMessage">Mensaje</span>
+    </div>
+
+    <script>
+        // Datos de prueba
+        const claimsData = [
+            {
+                id: "REC-2024-001",
+                tienda: "Tienda Principal",
+                cedis: "CEDIS Central",
+                fecha: "2024-03-31T10:30:00",
+                estado: "pendiente",
+                prioridad: "alta",
+                tipo: "Producto Dañado",
+                productos: [
+                    { sku: "PROD-001", nombre: "Caja de Herramientas 150 pzas", cantidad: 3, unidad: "u", motivo: "Cajas abolladas en transporte" }
+                ],
+                descripcion: "Las cajas llegaron con golpes visibles en las esquinas. El contenido parece estar bien pero el empaque está dañado.",
+                accion: "reposicion",
+                destinatarios: ["cedis@empresa.com", "transporte@empresa.com"],
+                historial: [
+                    { fecha: "2024-03-31T10:30:00", accion: "Reclamo creado", usuario: "Tienda Principal" }
+                ]
+            },
+            {
+                id: "REC-2024-002",
+                tienda: "Tienda Principal",
+                cedis: "CEDIS Central",
+                fecha: "2024-03-30T14:15:00",
+                estado: "proceso",
+                prioridad: "media",
+                tipo: "Faltante de Mercancía",
+                productos: [
+                    { sku: "PROD-045", nombre: "Taladro Inalámbrico 20V", cantidad: 2, unidad: "u", motivo: "No llegaron las unidades solicitadas" }
+                ],
+                descripcion: "En el pedido #45892 faltaron 2 unidades de taladros. Se revisó el empaque y no presentaba daños, posible error de picking.",
+                accion: "traslado",
+                destinatarios: ["cedis@empresa.com"],
+                historial: [
+                    { fecha: "2024-03-30T14:15:00", accion: "Reclamo creado", usuario: "Tienda Principal" },
+                    { fecha: "2024-03-30T16:45:00", accion: "En revisión por CEDIS", usuario: "Sistema" }
+                ]
+            },
+            {
+                id: "REC-2024-003",
+                tienda: "Tienda Norte",
+                cedis: "CEDIS Norte",
+                fecha: "2024-03-29T09:00:00",
+                estado: "resuelto",
+                prioridad: "baja",
+                tipo: "Problema de Calidad",
+                productos: [
+                    { sku: "PROD-112", nombre: "Lijadora Orbital 5'", cantidad: 1.5, unidad: "kg", motivo: "Producto con defecto de fábrica" }
+                ],
+                descripcion: "La lijadora enciende pero no gira el disco. Parece ser defecto de fábrica en el eje motor.",
+                accion: "301",
+                destinatarios: ["cedis@empresa.com", "garantias@empresa.com"],
+                historial: [
+                    { fecha: "2024-03-29T09:00:00", accion: "Reclamo creado", usuario: "Tienda Norte" },
+                    { fecha: "2024-03-29T11:30:00", accion: "Aprobado para devolución", usuario: "CEDIS Norte" },
+                    { fecha: "2024-03-30T10:00:00", accion: "Nota de crédito emitida", usuario: "Sistema" }
+                ]
+            },
+            {
+                id: "REC-2024-004",
+                tienda: "Tienda Principal",
+                cedis: "CEDIS Central",
+                fecha: "2024-03-28T16:20:00",
+                estado: "pendiente",
+                prioridad: "alta",
+                tipo: "Sobrante de Mercancía",
+                productos: [
+                    { sku: "PROD-089", nombre: "Sierra Caladora 6.5A", cantidad: 5, unidad: "u", motivo: "Llegaron 5 unidades de más" }
+                ],
+                descripcion: "El pedido indicaba 10 unidades pero llegaron 15. Las 5 unidades sobrantes están sin abrir en almacén.",
+                accion: "traslado",
+                destinatarios: ["cedis@empresa.com"],
+                historial: [
+                    { fecha: "2024-03-28T16:20:00", accion: "Reclamo creado", usuario: "Tienda Principal" }
+                ]
+            },
+            {
+                id: "REC-2024-005",
+                tienda: "Tienda Sur",
+                cedis: "CEDIS Central",
+                fecha: "2024-03-27T11:00:00",
+                estado: "proceso",
+                prioridad: "media",
+                tipo: "Producto Dañado",
+                productos: [
+                    { sku: "PROD-203", nombre: "Compresor de Aire 24L", cantidad: 1, unidad: "u", motivo: "Tanque abollado" },
+                    { sku: "PROD-204", nombre: "Manguera para Compresor 10m", cantidad: 2.5, unidad: "kg", motivo: "Conectores rotos" }
+                ],
+                descripcion: "El compresor llegó con el tanque visiblemente abollado. Las mangueras también presentan daños en los conectores de plástico.",
+                accion: "reposicion",
+                destinatarios: ["cedis@empresa.com", "transporte@empresa.com"],
+                historial: [
+                    { fecha: "2024-03-27T11:00:00", accion: "Reclamo creado", usuario: "Tienda Sur" },
+                    { fecha: "2024-03-27T15:30:00", accion: "Fotos verificadas por CEDIS", usuario: "Sistema" }
+                ]
+            }
+        ];
+
+        let currentFilter = 'todos';
+        let modalCallback = null;
+
+        const accionesTexto = {
+            'reposicion': 'Reposición del material',
+            'traslado': 'Traslado',
+            '301': '301'
+        };
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+            document.getElementById('userName').textContent = email.split('@')[0];
+            
+            renderStats();
+            renderClaims();
+            showToast('Bienvenido a Reclamos CEDIS', '👋');
+        });
+
+        function logout() {
+            document.getElementById('appContainer').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // Navegación
+        function showDashboard() {
+            document.getElementById('dashboardView').classList.remove('hidden');
+            document.getElementById('newClaimView').classList.add('hidden');
+            document.getElementById('claimDetailView').classList.add('hidden');
+            renderStats();
+            renderClaims();
+        }
+
+        function showNewClaim() {
+            document.getElementById('dashboardView').classList.add('hidden');
+            document.getElementById('newClaimView').classList.remove('hidden');
+            document.getElementById('newClaimView').classList.add('animate-fade-in');
+            document.getElementById('claimDetailView').classList.add('hidden');
+        }
+
+        function showClaimDetail(id) {
+            const claim = claimsData.find(c => c.id === id);
+            if (!claim) return;
+
+            document.getElementById('dashboardView').classList.add('hidden');
+            document.getElementById('newClaimView').classList.add('hidden');
+            document.getElementById('claimDetailView').classList.remove('hidden');
+            
+            const detailContent = document.getElementById('detailContent');
+            
+            const estadoTexto = {
+                'pendiente': 'Pendiente',
+                'proceso': 'En Proceso',
+                'resuelto': 'Resuelto'
+            };
+
+            const productosHtml = claim.productos.map(p => `
+                <div class="product-item">
+                    <div class="product-image">📦</div>
+                    <div class="product-details">
+                        <div class="product-name">${p.nombre}</div>
+                        <div class="product-sku">SKU: ${p.sku} | Cantidad: ${p.cantidad} ${p.unidad || 'u'}</div>
+                        <div class="product-reason">
+                            <strong>Motivo:</strong> ${p.motivo}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const historialHtml = claim.historial.map(h => `
+                <div class="timeline-item">
+                    <div class="timeline-time">${formatDate(h.fecha)}</div>
+                    <div class="timeline-content">
+                        <strong>${h.accion}</strong><br>
+                        <span style="color: var(--gray-600); font-size: 14px;">Por: ${h.usuario}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            detailContent.innerHTML = `
+                <div class="detail-header">
+                    <div class="detail-title-section">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                            <span class="claim-id">${claim.id}</span>
+                            <span class="claim-status ${claim.estado}">${estadoTexto[claim.estado]}</span>
+                        </div>
+                        <h2>${claim.tipo}</h2>
+                        <div class="detail-meta">
+                            📅 Creado el ${formatDate(claim.fecha)} • 🏪 ${claim.tienda} • 🏭 ${claim.cedis}
+                        </div>
+                    </div>
+                    <div class="detail-actions">
+                        ${claim.estado !== 'resuelto' ? `
+                            <button class="btn btn-success" onclick="updateStatus('${claim.id}', 'resuelto')">Marcar Resuelto</button>
+                            ${claim.estado === 'pendiente' ? `<button class="btn btn-primary" onclick="updateStatus('${claim.id}', 'proceso')">En Proceso</button>` : ''}
+                        ` : ''}
+                        <button class="btn btn-secondary" onclick="showModal('Confirmar', '¿Deseas eliminar este reclamo?', () => deleteClaim('${claim.id}'))">Eliminar</button>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>📋 Información General</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Prioridad</div>
+                            <div class="info-value" style="text-transform: uppercase;">${claim.prioridad}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Tipo de Reclamo</div>
+                            <div class="info-value">${claim.tipo}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Acción Esperada</div>
+                            <div class="info-value">${accionesTexto[claim.accion] || claim.accion}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>📝 Descripción</h3>
+                    <p style="line-height: 1.8; color: var(--gray-600);">${claim.descripcion}</p>
+                </div>
+
+                <div class="detail-section">
+                    <h3>📦 Productos Afectados (${claim.productos.length})</h3>
+                    <div class="products-list">
+                        ${productosHtml}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>👥 Destinatarios</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        ${claim.destinatarios.map(d => `<span style="background: var(--gray-100); padding: 8px 16px; border-radius: 20px; font-size: 14px;">${d}</span>`).join('')}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>📊 Historial de Actualizaciones</h3>
+                    <div class="timeline">
+                        ${historialHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Renderizar estadísticas con barras lineales compactas
+        function renderStats() {
+            const total = claimsData.length;
+            const pendientes = claimsData.filter(c => c.estado === 'pendiente').length;
+            const proceso = claimsData.filter(c => c.estado === 'proceso').length;
+            const resueltos = claimsData.filter(c => c.estado === 'resuelto').length;
+
+            const stats = [
+                { 
+                    label: 'Pendientes', 
+                    value: pendientes, 
+                    icon: '⏳', 
+                    class: 'pendiente',
+                    percent: total > 0 ? ((pendientes / total) * 100).toFixed(1) : 0
+                },
+                { 
+                    label: 'En Proceso', 
+                    value: proceso, 
+                    icon: '🔄', 
+                    class: 'proceso',
+                    percent: total > 0 ? ((proceso / total) * 100).toFixed(1) : 0
+                },
+                { 
+                    label: 'Resueltos', 
+                    value: resueltos, 
+                    icon: '✅', 
+                    class: 'resuelto',
+                    percent: total > 0 ? ((resueltos / total) * 100).toFixed(1) : 0
+                },
+                { 
+                    label: 'Total', 
+                    value: total, 
+                    icon: '📊', 
+                    class: 'total',
+                    percent: '100.0'
+                }
+            ];
+
+            const container = document.getElementById('statsContainer');
+            container.innerHTML = stats.map(stat => `
+                <div class="stat-bar-card">
+                    <div class="stat-bar-header">
+                        <div class="stat-bar-label">
+                            <div class="stat-bar-icon ${stat.class}">${stat.icon}</div>
+                            ${stat.label}
+                        </div>
+                        <div class="stat-bar-numbers">
+                            <span class="stat-bar-value">${stat.value}</span>
+                            <span class="stat-bar-percent">${stat.percent}%</span>
+                        </div>
+                    </div>
+                    <div class="stat-bar-visual">
+                        <div class="stat-bar-fill ${stat.class}" style="width: ${stat.percent}%; --target-width: ${stat.percent}%"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Renderizar lista
+        function renderClaims() {
+            const list = document.getElementById('claimsList');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = claimsData;
+            
+            if (currentFilter !== 'todos') {
+                filtered = filtered.filter(c => c.estado === currentFilter);
+            }
+            
+            if (searchTerm) {
+                filtered = filtered.filter(c => 
+                    c.id.toLowerCase().includes(searchTerm) ||
+                    c.productos.some(p => p.nombre.toLowerCase().includes(searchTerm)) ||
+                    c.descripcion.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            filtered.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div class="empty-title">No hay reclamos</div>
+                        <div class="empty-text">No se encontraron reclamos con los filtros seleccionados</div>
+                        <button class="btn btn-primary" onclick="showNewClaim()">Crear primer reclamo</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const estadoTexto = {
+                'pendiente': 'Pendiente',
+                'proceso': 'En Proceso',
+                'resuelto': 'Resuelto'
+            };
+
+            list.innerHTML = filtered.map(claim => `
+                <div class="claim-card ${claim.estado}" onclick="showClaimDetail('${claim.id}')">
+                    <div class="claim-header">
+                        <span class="claim-id">${claim.id}</span>
+                        <span class="claim-status ${claim.estado}">${estadoTexto[claim.estado]}</span>
+                    </div>
+                    <div class="claim-title">${claim.tipo} - ${claim.productos.length} producto(s)</div>
+                    <div class="claim-meta">
+                        <span>📅 ${formatDateShort(claim.fecha)}</span>
+                        <span>🏪 ${claim.tienda}</span>
+                        <span>🏭 ${claim.cedis}</span>
+                        <span>⚡ ${claim.prioridad.toUpperCase()}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filtros
+        function filterByStatus(status, element) {
+            currentFilter = status;
+            document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
+            element.classList.add('active');
+            renderClaims();
+        }
+
+        function filterClaims() {
+            renderClaims();
+        }
+
+        // Acciones
+        function updateStatus(id, newStatus) {
+            const claim = claimsData.find(c => c.id === id);
+            if (claim) {
+                claim.estado = newStatus;
+                claim.historial.push({
+                    fecha: new Date().toISOString(),
+                    accion: newStatus === 'resuelto' ? 'Reclamo resuelto' : 'En proceso de atención',
+                    usuario: 'Sistema'
+                });
+                showToast('Estado actualizado correctamente', '✓');
+                showClaimDetail(id);
+                renderStats();
+            }
+        }
+
+        function deleteClaim(id) {
+            const index = claimsData.findIndex(c => c.id === id);
+            if (index > -1) {
+                claimsData.splice(index, 1);
+                closeModal();
+                showToast('Reclamo eliminado', '🗑️');
+                showDashboard();
+            }
+        }
+
+        // Formulario nuevo reclamo
+        function addProductField() {
+            const container = document.getElementById('productsContainer');
+            const newProduct = document.createElement('div');
+            newProduct.className = 'product-item';
+            newProduct.style.cssText = 'background: white; border: 2px solid var(--gray-200); margin-top: 12px;';
+            newProduct.innerHTML = `
+                <div class="form-group" style="flex: 1;">
+                    <label>SKU / Código *</label>
+                    <input type="text" placeholder="Ej: PROD-001" required>
+                </div>
+                <div class="form-group" style="flex: 2;">
+                    <label>Descripción *</label>
+                    <input type="text" placeholder="Nombre del producto" required>
+                </div>
+                <div class="form-group" style="width: 150px;">
+                    <label>Cantidad *</label>
+                    <div class="quantity-group">
+                        <input type="number" step="0.01" min="0.01" value="1" required>
+                        <select>
+                            <option value="u">u</option>
+                            <option value="kg">kg</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" onclick="this.parentElement.remove()" style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 20px; margin-top: 20px;">✕</button>
+            `;
+            container.appendChild(newProduct);
+        }
+
+        function simulateUpload() {
+            const container = document.getElementById('uploadedFiles');
+            const files = ['foto1.jpg', 'foto2.jpg', 'foto3.jpg'];
+            container.innerHTML = files.map((f, i) => `
+                <div style="position: relative; background: var(--gray-100); padding: 8px 12px; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+                    <span>📷</span>
+                    <span style="font-size: 14px;">evidencia_${i+1}.jpg</span>
+                    <button type="button" onclick="this.parentElement.remove()" style="background: none; border: none; color: var(--danger); cursor: pointer; margin-left: 8px;">✕</button>
+                </div>
+            `).join('');
+            showToast('Fotos cargadas correctamente', '📸');
+        }
+
+        function submitClaim(e) {
+            e.preventDefault();
+            
+            const newClaim = {
+                id: `REC-2024-${String(claimsData.length + 1).padStart(3, '0')}`,
+                tienda: "Tienda Principal",
+                cedis: "CEDIS Central",
+                fecha: new Date().toISOString(),
+                estado: "pendiente",
+                prioridad: "media",
+                tipo: "Producto Dañado",
+                productos: [{ sku: "NEW-001", nombre: "Producto Nuevo", cantidad: 1.5, unidad: "kg", motivo: "Reclamo nuevo" }],
+                descripcion: "Nuevo reclamo creado desde el sistema",
+                accion: "reposicion",
+                destinatarios: ["cedis@empresa.com"],
+                historial: [{ fecha: new Date().toISOString(), accion: "Reclamo creado", usuario: "Tienda Principal" }]
+            };
+            
+            claimsData.unshift(newClaim);
+            showToast('Reclamo creado exitosamente', '✓');
+            showDashboard();
+        }
+
+        // Utilidades
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES', { 
+                day: '2-digit', 
+                month: 'long', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function formatDateShort(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES', { 
+                day: '2-digit', 
+                month: 'short'
+            });
+        }
+
+        function showToast(message, icon = '✓') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            document.getElementById('toastIcon').textContent = icon;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Modal
+        function showModal(title, text, onConfirm) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalText').textContent = text;
+            document.getElementById('modal').classList.add('active');
+            modalCallback = onConfirm;
+        }
+
+        function closeModal(e) {
+            if (!e || e.target === document.getElementById('modal')) {
+                document.getElementById('modal').classList.remove('active');
+                modalCallback = null;
+            }
+        }
+
+        function confirmModal() {
+            if (modalCallback) modalCallback();
+        }
+    </script>
+</body>
+</html>
